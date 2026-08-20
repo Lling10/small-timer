@@ -7,21 +7,25 @@
 }
 
 :root {
-  --bg: #0f1419;
-  --surface: #1a2332;
-  --surface-hover: #243044;
-  --accent: #3b82f6;
-  --accent-hover: #2563eb;
-  --text: #f1f5f9;
-  --text-muted: #94a3b8;
-  --border: #334155;
-  --success: #22c55e;
-  --warning: #f59e0b;
+  --bg: #fff5f8;
+  --surface: rgba(255, 255, 255, 0.85);
+  --surface-hover: #ffe8f0;
+  --accent: #ff8fab;
+  --accent-hover: #ff6b9d;
+  --text: #5c4a52;
+  --text-muted: #a08896;
+  --border: #ffd6e8;
+  --success: #6ecf9a;
+  --warning: #ffb86c;
 }
 
 body {
   font-family: "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  background: var(--bg);
+  background:
+    radial-gradient(circle at 15% 20%, rgba(255, 182, 193, 0.45) 0%, transparent 45%),
+    radial-gradient(circle at 85% 75%, rgba(216, 180, 254, 0.4) 0%, transparent 45%),
+    radial-gradient(circle at 50% 90%, rgba(255, 218, 233, 0.5) 0%, transparent 40%),
+    linear-gradient(160deg, #ffe8f0 0%, #fff5f8 40%, #f5eeff 75%, #ffe4ec 100%);
   color: var(--text);
   min-height: 100vh;
   display: flex;
@@ -57,7 +61,8 @@ body {
   border-radius: 1.25rem;
   padding: 2rem;
   border: 1px solid var(--border);
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 20px 40px -12px rgba(255, 143, 171, 0.25);
+  backdrop-filter: blur(8px);
 }
 
 /* 模式切换 */
@@ -65,7 +70,7 @@ body {
   display: flex;
   gap: 0.5rem;
   margin-bottom: 1.5rem;
-  background: var(--bg);
+  background: rgba(255, 214, 232, 0.5);
   padding: 0.25rem;
   border-radius: 0.75rem;
 }
