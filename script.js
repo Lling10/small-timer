@@ -23,6 +23,65 @@
   let lapCount = 0;
 
   /**
+   * 从输入框读取倒计时目标毫秒数
+   */
+  function getCountdownTargetMs() {
+    const min = Math.min(99, Math.max(0, parseInt(minutesInput.value, 10) || 0));
+    const sec = Math.min(59, Math.max(0, parseInt(secondsInput.value, 10) || 0));
+    return (min * 60 + sec) * 1000;
+  }
+
+  /**
+   * 规范化倒计时输入值
+   */
+  function normalizeCountdownInputs() {
+    minutesInput.value = Math.min(99, Math.max(0, parseInt(minutesInput.value, 10) || 0));
+    secondsInput.value = Math.min(59, Math.max(0, parseInt(secondsInput.value, 10) || 0));
+  }
+
+  /**
+   * 倒计时是否处于空闲状态（未开始或已重置）
+   */
+  function isCountdownIdle() {
+    return mode === 'countdown' && !intervalId && elapsed === 0 && countdownTotal === 0;
+  }
+
+  /**
+   * 播放倒计时结束提示音
+   */
+  function playFinishSound() {
+    try {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return;
+
+      const ctx = new AudioCtx();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.type = 'sine';
+      osc.frequency.value = 880;
+      gain.gain.setValueAtTime(0.25, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.6);
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime + 0.6);
+    } catch (_) {
+      // 浏览器不支持或用户未交互时忽略
+    }
+  }
+
+  /**
+   * 倒计时结束处理
+   */
+  function onCountdownFinished() {
+    display.classList.add('finished');
+    stopTimer();
+    startBtn.disabled = true;
+    playFinishSound();
+  }
+
+  /**
    * 将毫秒格式化为 HH:MM:SS 或 MM:SS
    */
   function formatTime(ms) {
@@ -44,23 +103,28 @@
    */
   function updateDisplay() {
     let showMs = elapsed;
+
     if (mode === 'countdown') {
-      showMs = Math.max(0, countdownTotal - elapsed);
+      if (isCountdownIdle()) {
+        // 空闲时预览输入的目标时间
+        showMs = getCountdownTargetMs();
+      } else {
+        showMs = Math.max(0, countdownTotal - elapsed);
+      }
     }
+
     display.textContent = formatTime(showMs);
 
     // 倒计时剩余 10 秒内警告样式
-    if (mode === 'countdown' && showMs > 0 && showMs <= 10000) {
+    if (mode === 'countdown' && !isCountdownIdle() && showMs > 0 && showMs <= 10000) {
       display.classList.add('warning');
     } else {
       display.classList.remove('warning');
     }
 
-    // 倒计时结束
-    if (mode === 'countdown' && showMs === 0 && elapsed >= countdownTotal) {
-      display.classList.add('finished');
-      stopTimer();
-      startBtn.disabled = true;
+    // 倒计时结束（仅在计时运行中触发）
+    if (mode === 'countdown' && intervalId && showMs === 0 && elapsed >= countdownTotal) {
+      onCountdownFinished();
     }
   }
 
@@ -71,9 +135,8 @@
     if (intervalId) return;
 
     if (mode === 'countdown' && elapsed === 0) {
-      const min = parseInt(minutesInput.value, 10) || 0;
-      const sec = parseInt(secondsInput.value, 10) || 0;
-      countdownTotal = (min * 60 + sec) * 1000;
+      normalizeCountdownInputs();
+      countdownTotal = getCountdownTargetMs();
       if (countdownTotal <= 0) {
         alert('请设置有效的倒计时时间');
         return;
@@ -102,8 +165,6 @@
     if (mode === 'countdown' && elapsed >= countdownTotal) {
       elapsed = countdownTotal;
       updateDisplay();
-      stopTimer();
-      startBtn.disabled = true;
       return;
     }
 
@@ -202,6 +263,16 @@
 
   modeBtns.forEach((btn) => {
     btn.addEventListener('click', () => switchMode(btn.dataset.mode));
+  });
+
+  // 倒计时输入变化时实时更新预览
+  [minutesInput, secondsInput].forEach((input) => {
+    input.addEventListener('input', () => {
+      if (mode !== 'countdown' || intervalId) return;
+      normalizeCountdownInputs();
+      display.classList.remove('warning', 'finished');
+      updateDisplay();
+    });
   });
 
   // 初始化显示
