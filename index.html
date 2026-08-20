@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>计时器</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app">
+    <header class="header">
+      <h1 class="title">计时器</h1>
+      <p class="subtitle">秒表 · 倒计时</p>
+    </header>
+
+    <main class="main">
+      <!-- 模式切换 -->
+      <div class="mode-switch" role="tablist">
+        <button class="mode-btn active" data-mode="stopwatch" role="tab" aria-selected="true">秒表</button>
+        <button class="mode-btn" data-mode="countdown" role="tab" aria-selected="false">倒计时</button>
+      </div>
+
+      <!-- 倒计时设置（仅倒计时模式显示） -->
+      <div class="countdown-setup hidden" id="countdownSetup">
+        <label for="minutes">分钟</label>
+        <input type="number" id="minutes" min="0" max="99" value="5">
+        <label for="seconds">秒</label>
+        <input type="number" id="seconds" min="0" max="59" value="0">
+      </div>
+
+      <!-- 时间显示 -->
+      <div class="display" id="display" aria-live="polite">00:00:00</div>
+
+      <!-- 控制按钮 -->
+      <div class="controls">
+        <button class="btn btn-start" id="startBtn">开始</button>
+        <button class="btn btn-pause" id="pauseBtn" disabled>暂停</button>
+        <button class="btn btn-reset" id="resetBtn">重置</button>
+      </div>
+
+      <!-- 计次记录（仅秒表模式） -->
+      <div class="laps" id="lapsSection">
+        <button class="btn btn-lap" id="lapBtn" disabled>计次</button>
+        <ul class="lap-list" id="lapList"></ul>
+      </div>
+    </main>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

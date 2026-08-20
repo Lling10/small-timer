@@ -1,0 +1,251 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --bg: #0f1419;
+  --surface: #1a2332;
+  --surface-hover: #243044;
+  --accent: #3b82f6;
+  --accent-hover: #2563eb;
+  --text: #f1f5f9;
+  --text-muted: #94a3b8;
+  --border: #334155;
+  --success: #22c55e;
+  --warning: #f59e0b;
+}
+
+body {
+  font-family: "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}
+
+.app {
+  width: 100%;
+  max-width: 420px;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.title {
+  font-size: 1.75rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.subtitle {
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+.main {
+  background: var(--surface);
+  border-radius: 1.25rem;
+  padding: 2rem;
+  border: 1px solid var(--border);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+/* 模式切换 */
+.mode-switch {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  background: var(--bg);
+  padding: 0.25rem;
+  border-radius: 0.75rem;
+}
+
+.mode-btn {
+  flex: 1;
+  padding: 0.625rem 1rem;
+  border: none;
+  border-radius: 0.5rem;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.mode-btn:hover {
+  color: var(--text);
+}
+
+.mode-btn.active {
+  background: var(--accent);
+  color: white;
+}
+
+/* 倒计时设置 */
+.countdown-setup {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.countdown-setup.hidden {
+  display: none;
+}
+
+.countdown-setup label {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+
+.countdown-setup input {
+  width: 4rem;
+  padding: 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 1rem;
+  text-align: center;
+}
+
+.countdown-setup input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+/* 时间显示 */
+.display {
+  font-size: 3.5rem;
+  font-weight: 300;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  letter-spacing: 0.05em;
+  margin-bottom: 2rem;
+  color: var(--text);
+}
+
+.display.warning {
+  color: var(--warning);
+}
+
+.display.finished {
+  color: var(--success);
+  animation: pulse 0.5s ease infinite alternate;
+}
+
+@keyframes pulse {
+  from { opacity: 1; }
+  to { opacity: 0.7; }
+}
+
+/* 控制按钮 */
+.controls {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.btn {
+  flex: 1;
+  padding: 0.875rem 1.25rem;
+  border: none;
+  border-radius: 0.75rem;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.btn-start {
+  background: var(--accent);
+  color: white;
+}
+
+.btn-start:hover:not(:disabled) {
+  background: var(--accent-hover);
+}
+
+.btn-pause {
+  background: var(--surface-hover);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+.btn-pause:hover:not(:disabled) {
+  background: var(--border);
+}
+
+.btn-reset {
+  background: transparent;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+}
+
+.btn-reset:hover:not(:disabled) {
+  color: var(--text);
+  border-color: var(--text-muted);
+}
+
+/* 计次 */
+.laps {
+  border-top: 1px solid var(--border);
+  padding-top: 1.5rem;
+}
+
+.laps.hidden {
+  display: none;
+}
+
+.btn-lap {
+  width: 100%;
+  margin-bottom: 1rem;
+  background: var(--surface-hover);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+.btn-lap:hover:not(:disabled) {
+  background: var(--border);
+}
+
+.lap-list {
+  list-style: none;
+  max-height: 180px;
+  overflow-y: auto;
+}
+
+.lap-list li {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border);
+}
+
+.lap-list li:last-child {
+  border-bottom: none;
+}
+
+.lap-list .lap-time {
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+}
