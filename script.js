@@ -7,6 +7,9 @@
   const UNIT_SEC = 'sec';
   const UNIT_MIN = 'min';
   const STORAGE_KEY = 'small-timer.v1';
+  const THEME_STORAGE_KEY = 'small-timer.theme';
+  const THEMES = ['sport', 'sweet', 'neutral'];
+  const DEFAULT_THEME = 'sport';
 
   /** 内置训练模板（不写入 localStorage） */
   const PRESETS = [
@@ -149,9 +152,12 @@
   const setRestHourInput = document.getElementById('setRestHour');
   const setRestMinInput = document.getElementById('setRestMin');
   const setRestSecInput = document.getElementById('setRestSec');
+  const themeSwitch = document.getElementById('themeSwitch');
 
   // 当前应用模式
   let currentMode = MODE_EXERCISE;
+  // 当前界面风格
+  let currentTheme = DEFAULT_THEME;
   // 提前提醒秒数（从配置加载）
   let alertBeforeSec = 3;
 
@@ -212,6 +218,44 @@
       return { value: sec / 60, unit: UNIT_MIN };
     }
     return { value: sec, unit: UNIT_SEC };
+  }
+
+  /**
+   * 规范化风格名称
+   */
+  function normalizeTheme(theme) {
+    return THEMES.includes(theme) ? theme : DEFAULT_THEME;
+  }
+
+  /**
+   * 读取已保存的界面风格
+   */
+  function loadTheme() {
+    try {
+      return normalizeTheme(localStorage.getItem(THEME_STORAGE_KEY));
+    } catch (_) {
+      return DEFAULT_THEME;
+    }
+  }
+
+  /**
+   * 应用界面风格并同步按钮状态
+   */
+  function applyTheme(theme) {
+    currentTheme = normalizeTheme(theme);
+    document.body.setAttribute('data-theme', currentTheme);
+
+    if (themeSwitch) {
+      themeSwitch.querySelectorAll('.theme-btn').forEach((btn) => {
+        btn.classList.toggle('active', btn.dataset.theme === currentTheme);
+      });
+    }
+
+    try {
+      localStorage.setItem(THEME_STORAGE_KEY, currentTheme);
+    } catch (_) {
+      // 配额不足等忽略
+    }
   }
 
   /**
@@ -1768,6 +1812,15 @@
 
   exportConfigBtn.addEventListener('click', exportConfig);
 
+  // 风格切换（可随时切换，不影响计时逻辑）
+  if (themeSwitch) {
+    themeSwitch.addEventListener('click', (e) => {
+      const btn = e.target.closest('.theme-btn');
+      if (!btn || !btn.dataset.theme) return;
+      applyTheme(btn.dataset.theme);
+    });
+  }
+
   // 配置变更自动保存（排除方案切换本身）
   configSection.addEventListener('input', (e) => {
     if (e.target.closest('#planSelect, #saveDialog')) return;
@@ -1779,6 +1832,7 @@
   });
 
   // 初始化
+  applyTheme(loadTheme());
   populatePresetChips();
   addActionRow();
   bootstrapConfig();
