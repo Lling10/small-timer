@@ -1,0 +1,17 @@
+{
+  "mode": "exercise",
+  "alertBeforeSec": 3,
+  "normal": {
+    "durationSec": 60
+  },
+  "exercise": {
+    "actions": [
+      { "name": "开合跳", "durationSec": 30 },
+      { "name": "深蹲", "durationSec": 30 },
+      { "name": "平板支撑", "durationSec": 45 }
+    ],
+    "actionRestSec": 10,
+    "totalSets": 3,
+    "setRestSec": 60
+  }
+}

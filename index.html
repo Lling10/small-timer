@@ -3,46 +3,158 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>计时器</title>
+  <title>自定义循环计时器</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div class="app">
     <header class="header">
-      <h1 class="title">计时器</h1>
-      <p class="subtitle">秒表 · 倒计时</p>
+      <div class="header-text">
+        <h1 class="title">自定义循环计时器</h1>
+        <p class="subtitle">普通计时 · 运动循环 · 完全自定义</p>
+      </div>
+      <div class="header-actions">
+        <div class="mode-indicator" id="modeIndicator">
+          <span class="mode-label">当前模式</span>
+          <span class="mode-badge" id="modeBadge">运动模式</span>
+        </div>
+        <span class="autosave-hint" id="autosaveHint" aria-live="polite">自动记忆已开启</span>
+      </div>
     </header>
 
     <main class="main">
-      <!-- 模式切换 -->
-      <div class="mode-switch" role="tablist">
-        <button class="mode-btn active" data-mode="stopwatch" role="tab" aria-selected="true">秒表</button>
-        <button class="mode-btn" data-mode="countdown" role="tab" aria-selected="false">倒计时</button>
-      </div>
+      <!-- 左侧：播放与控制 -->
+      <aside class="panel panel-player">
+        <section class="mode-switch" id="modeSwitch">
+          <button type="button" class="mode-btn" data-mode="normal" id="modeNormalBtn">普通模式</button>
+          <button type="button" class="mode-btn active" data-mode="exercise" id="modeExerciseBtn">运动模式</button>
+        </section>
 
-      <!-- 倒计时设置（仅倒计时模式显示） -->
-      <div class="countdown-setup hidden" id="countdownSetup">
-        <label for="minutes">分钟</label>
-        <input type="number" id="minutes" min="0" max="99" value="5">
-        <label for="seconds">秒</label>
-        <input type="number" id="seconds" min="0" max="59" value="0">
-      </div>
+        <section class="player" id="playerSection" aria-live="polite">
+          <div class="phase-badge" id="phaseBadge">待机</div>
+          <div class="action-display" id="actionDisplay">—</div>
+          <div class="countdown" id="countdown">—</div>
+          <div class="set-progress" id="setProgressWrap">
+            <span class="set-progress-text" id="setProgressText">第 — / — 组</span>
+            <div class="progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+              <div class="progress-fill" id="progressFill"></div>
+            </div>
+          </div>
+          <div class="normal-progress hidden" id="normalProgressWrap">
+            <div class="progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+              <div class="progress-fill" id="normalProgressFill"></div>
+            </div>
+          </div>
+          <p class="finish-message hidden" id="finishMessage">全部完成 🎉</p>
+        </section>
 
-      <!-- 时间显示 -->
-      <div class="display" id="display" aria-live="polite">00:00:00</div>
+        <div class="controls">
+          <button class="btn btn-start" id="startBtn">开始</button>
+          <button class="btn btn-pause" id="pauseBtn" disabled>暂停</button>
+          <button class="btn btn-reset" id="resetBtn">重置</button>
+        </div>
+      </aside>
 
-      <!-- 控制按钮 -->
-      <div class="controls">
-        <button class="btn btn-start" id="startBtn">开始</button>
-        <button class="btn btn-pause" id="pauseBtn" disabled>暂停</button>
-        <button class="btn btn-reset" id="resetBtn">重置</button>
-      </div>
+      <!-- 右侧：方案 + 配置 -->
+      <section class="panel panel-config" id="configSection">
+        <div class="plan-bar" id="planBar">
+          <div class="plan-bar-row">
+            <label class="plan-field plan-field-grow">
+              <span class="plan-field-label">我的方案</span>
+              <select id="planSelect" class="plan-select" aria-label="选择已保存的方案">
+                <option value="">当前编辑（未保存为方案）</option>
+              </select>
+            </label>
+            <button type="button" class="btn btn-io" id="savePlanBtn">保存</button>
+            <button type="button" class="btn btn-io" id="newPlanBtn" title="清空为空白训练">新建</button>
+            <button type="button" class="btn btn-io btn-io-danger" id="deletePlanBtn" disabled>删除</button>
+            <div class="backup-wrap">
+              <button type="button" class="btn btn-io btn-backup" id="backupToggleBtn" aria-expanded="false" aria-haspopup="true" title="备份与恢复">⋯</button>
+              <div class="backup-menu hidden" id="backupMenu" role="menu">
+                <button type="button" class="backup-item" id="importConfigBtn" role="menuitem">恢复备份</button>
+                <button type="button" class="backup-item" id="exportConfigBtn" role="menuitem">导出备份</button>
+              </div>
+            </div>
+            <input type="file" id="importFileInput" accept=".json,application/json" hidden>
+          </div>
+          <p class="plan-status" id="planStatus" aria-live="polite"></p>
+          <div class="preset-row">
+            <span class="plan-field-label">一键套用模板</span>
+            <div class="preset-chips" id="presetChips" role="group" aria-label="训练模板"></div>
+          </div>
+          <p class="plan-help">模板会立刻填入下方动作与休息；满意后点「保存」起名，下次从「我的方案」里切换。点「新建」可清空重来。</p>
+        </div>
 
-      <!-- 计次记录（仅秒表模式） -->
-      <div class="laps" id="lapsSection">
-        <button class="btn btn-lap" id="lapBtn" disabled>计次</button>
-        <ul class="lap-list" id="lapList"></ul>
-      </div>
+        <div class="save-dialog hidden" id="saveDialog">
+          <label class="save-dialog-field">
+            <span class="field-label">方案名称</span>
+            <input type="text" id="savePlanNameInput" maxlength="40" placeholder="例如：晨练">
+          </label>
+          <div class="save-dialog-actions">
+            <button type="button" class="btn btn-io" id="savePlanCancelBtn">取消</button>
+            <button type="button" class="btn btn-io btn-io-primary" id="savePlanConfirmBtn">确定保存</button>
+          </div>
+        </div>
+
+        <p class="plan-toast hidden" id="planToast" role="status"></p>
+
+        <div class="config-block hidden" id="normalConfigBlock">
+          <h2 class="config-title">倒计时设置</h2>
+          <p class="config-hint">设置倒计时总时长（格式 00:00:00）</p>
+          <div class="field">
+            <span class="field-label">倒计时</span>
+            <span class="field-hms" id="normalDurationHms">
+              <input type="number" id="normalDurationHour" min="0" placeholder="00" aria-label="小时">
+              <span class="field-unit" aria-hidden="true">:</span>
+              <input type="number" id="normalDurationMin" min="0" max="59" placeholder="00" aria-label="分钟">
+              <span class="field-unit" aria-hidden="true">:</span>
+              <input type="number" id="normalDurationSec" min="0" max="59" placeholder="00" aria-label="秒">
+            </span>
+          </div>
+        </div>
+
+        <div class="config-block" id="exerciseConfigBlock">
+          <div class="config-header">
+            <h2 class="config-title">动作列表</h2>
+            <button type="button" class="btn btn-add" id="addActionBtn">+ 添加动作</button>
+          </div>
+          <p class="config-hint">为每个动作设置名称与时长（格式 00:00:00）</p>
+          <div class="action-list" id="actionList"></div>
+        </div>
+
+        <div class="config-block" id="exerciseSettingsBlock">
+          <h2 class="config-title">间隔与循环</h2>
+          <div class="settings-grid">
+            <label class="field field-wide">
+              <span class="field-label">动作间休息</span>
+              <span class="field-hms">
+                <input type="number" id="actionRestHour" min="0" placeholder="00" aria-label="动作间休息小时">
+                <span class="field-unit" aria-hidden="true">:</span>
+                <input type="number" id="actionRestMin" min="0" max="59" placeholder="00" aria-label="动作间休息分钟">
+                <span class="field-unit" aria-hidden="true">:</span>
+                <input type="number" id="actionRestSec" min="0" max="59" placeholder="00" aria-label="动作间休息秒">
+              </span>
+            </label>
+            <label class="field">
+              <span class="field-label">组数</span>
+              <input type="number" id="totalSets" min="1" placeholder="组">
+            </label>
+            <label class="field field-wide">
+              <span class="field-label">组间休息</span>
+              <span class="field-hms">
+                <input type="number" id="setRestHour" min="0" placeholder="00" aria-label="组间休息小时">
+                <span class="field-unit" aria-hidden="true">:</span>
+                <input type="number" id="setRestMin" min="0" max="59" placeholder="00" aria-label="组间休息分钟">
+                <span class="field-unit" aria-hidden="true">:</span>
+                <input type="number" id="setRestSec" min="0" max="59" placeholder="00" aria-label="组间休息秒">
+              </span>
+            </label>
+          </div>
+        </div>
+      </section>
     </main>
   </div>
 
